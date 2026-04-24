@@ -4,15 +4,26 @@ class Database {
 
     public static function getInstance(): PDO {
         if (self::$instance === null) {
-            // Supports Railway (PGHOST etc.) and custom env vars (DB_HOST etc.)
-            // Falls back to XAMPP localhost defaults
-            $host   = getenv('PGHOST')     ?: getenv('DB_HOST')     ?: 'localhost';
-            $port   = getenv('PGPORT')     ?: getenv('DB_PORT')     ?: '5432';
-            $dbname = getenv('PGDATABASE') ?: getenv('DB_NAME')     ?: 'sbms_db';
-            $user   = getenv('PGUSER')     ?: getenv('DB_USER')     ?: 'postgres';
-            $pass   = getenv('PGPASSWORD') ?: getenv('DB_PASSWORD') ?: 'root';
-
             try {
+                // Option 1: single DATABASE_URL env var (easiest for Render)
+                $url = getenv('DATABASE_URL');
+                if ($url) {
+                    $parts  = parse_url($url);
+                    $host   = $parts['host'];
+                    $port   = $parts['port']   ?? 5432;
+                    $dbname = ltrim($parts['path'], '/');
+                    $user   = $parts['user'];
+                    $pass   = $parts['pass'];
+                } else {
+                    // Option 2: individual env vars (PGHOST etc. from Supabase/Render)
+                    // Falls back to XAMPP localhost defaults
+                    $host   = getenv('PGHOST')     ?: 'localhost';
+                    $port   = getenv('PGPORT')     ?: '5432';
+                    $dbname = getenv('PGDATABASE') ?: 'sbms_db';
+                    $user   = getenv('PGUSER')     ?: 'postgres';
+                    $pass   = getenv('PGPASSWORD') ?: 'root';
+                }
+
                 $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
                 self::$instance = new PDO($dsn, $user, $pass, [
                     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
