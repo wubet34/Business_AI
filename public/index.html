@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business AI — Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<!-- Mobile sidebar backdrop -->
+<div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+<div class="app-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <i class="fa-solid fa-bolt logo-icon"></i>
+      <span class="logo-text">Business AI</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard">
+        <i class="fa-solid fa-chart-pie nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" data-page="customers">
+        <i class="fa-solid fa-users nav-icon"></i>
+        <span class="nav-label">Customers</span>
+      </a>
+      <a class="nav-item" data-page="products">
+        <i class="fa-solid fa-box nav-icon"></i>
+        <span class="nav-label">Products</span>
+      </a>
+      <a class="nav-item" data-page="sales">
+        <i class="fa-solid fa-receipt nav-icon"></i>
+        <span class="nav-label">Sales</span>
+      </a>
+      <a class="nav-item" data-page="ai">
+        <i class="fa-solid fa-robot nav-icon"></i>
+        <span class="nav-label">AI Assistant</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost sidebar-logout" id="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-wrap">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="topbar-title" id="page-title">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost btn-sm icon-btn" id="theme-toggle" title="Toggle theme">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <div class="user-info">
+          <div class="avatar" id="user-avatar">U</div>
+          <div class="user-details">
+            <span class="user-name" id="user-name">User</span>
+            <span class="role-badge" id="role-badge">Staff</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- ══ Dashboard ══ -->
+      <section class="page active" id="page-dashboard">
+        <div class="stat-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="stat-revenue">—</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-label">Low Stock Items</div>
+            <div class="stat-value" id="stat-lowstock">—</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
+            <div class="stat-label">Top Products</div>
+            <div class="stat-value" id="stat-products">—</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+            <div class="stat-label">Recent Sales</div>
+            <div class="stat-value" id="stat-sales">—</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa-solid fa-chart-line"></i> Revenue Trend
+            </div>
+            <div class="chart-wrap">
+              <canvas id="sales-chart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <i class="fa-solid fa-triangle-exclamation"></i> Low Stock Alerts
+            </div>
+            <div id="low-stock-alerts"></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="card-header">
+            <i class="fa-solid fa-receipt"></i> Recent Sales
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>ID</th><th>Customer</th><th>Total</th><th>Date</th></tr></thead>
+              <tbody id="recent-sales-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ Customers ══ -->
+      <section class="page" id="page-customers">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input class="form-control search-input" id="cust-search" placeholder="Search customers…">
+          </div>
+          <button class="btn btn-primary" id="btn-add-customer">
+            <i class="fa-solid fa-plus"></i> Add Customer
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Notes</th><th>Actions</th></tr></thead>
+              <tbody id="cust-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination-wrap" id="cust-pagination"></div>
+        </div>
+
+        <!-- Customer Modal -->
+        <div class="modal-overlay" id="cust-modal">
+          <div class="modal">
+            <div class="modal-header">
+              <span id="cust-modal-title">Add Customer</span>
+              <button class="modal-close" id="cust-modal-close" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <form id="cust-form" class="modal-body" novalidate>
+              <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> Name *</label>
+                <input type="text" id="cust_name" name="cust_name" class="form-control" placeholder="Full name" required>
+              </div>
+              <div class="form-group">
+                <label><i class="fa-solid fa-phone"></i> Phone</label>
+                <input type="text" id="cust_phone" name="cust_phone" class="form-control" placeholder="+1 555 0000">
+              </div>
+              <div class="form-group">
+                <label><i class="fa-solid fa-envelope"></i> Email</label>
+                <input type="email" id="cust_email" name="cust_email" class="form-control" placeholder="email@example.com">
+              </div>
+              <div class="form-group">
+                <label><i class="fa-solid fa-note-sticky"></i> Notes</label>
+                <textarea id="cust_notes" name="cust_notes" class="form-control" rows="3" placeholder="Optional notes…"></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('cust-modal')">
+                  <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Customer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ Products ══ -->
+      <section class="page" id="page-products">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input class="form-control search-input" id="prod-search" placeholder="Search products…">
+          </div>
+          <button class="btn btn-primary" id="btn-add-product">
+            <i class="fa-solid fa-plus"></i> Add Product
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Name</th><th>Price</th><th>Stock</th><th>Created</th><th>Actions</th></tr></thead>
+              <tbody id="prod-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination-wrap" id="prod-pagination"></div>
+        </div>
+
+        <!-- Product Modal -->
+        <div class="modal-overlay" id="prod-modal">
+          <div class="modal">
+            <div class="modal-header">
+              <span id="prod-modal-title">Add Product</span>
+              <button class="modal-close" id="prod-modal-close" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <form id="prod-form" class="modal-body" novalidate>
+              <div class="form-group">
+                <label><i class="fa-solid fa-tag"></i> Name *</label>
+                <input type="text" id="prod_name" name="prod_name" class="form-control" placeholder="Product name" required>
+              </div>
+              <div class="form-group">
+                <label><i class="fa-solid fa-dollar-sign"></i> Price *</label>
+                <input type="number" id="prod_price" name="prod_price" class="form-control" step="0.01" min="0" placeholder="0.00" required>
+              </div>
+              <div class="form-group">
+                <label><i class="fa-solid fa-cubes"></i> Stock Quantity *</label>
+                <input type="number" id="prod_stock" name="prod_stock" class="form-control" min="0" placeholder="0" required>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeModal('prod-modal')">
+                  <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Product
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ Sales ══ -->
+      <section class="page" id="page-sales">
+        <div class="sales-layout">
+
+          <!-- New Sale Form -->
+          <div class="card">
+            <div class="card-header">
+              <i class="fa-solid fa-cart-plus"></i> New Sale
+            </div>
+            <form id="sale-form" novalidate>
+              <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> Customer *</label>
+                <select id="sale-customer" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label><i class="fa-solid fa-list"></i> Items *</label>
+                <div id="sale-items-container"></div>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-add-sale-item" style="margin-top:8px">
+                  <i class="fa-solid fa-plus"></i> Add Item
+                </button>
+              </div>
+              <div class="sale-total-bar">
+                <span class="total-label">Total</span>
+                <span class="total-value" id="sale-total-display">$0.00</span>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">
+                <i class="fa-solid fa-check"></i> Create Sale
+              </button>
+            </form>
+          </div>
+
+          <!-- Sales History -->
+          <div class="card">
+            <div class="card-header sales-history-header">
+              <span><i class="fa-solid fa-clock-rotate-left"></i> Sales History</span>
+              <div class="sales-filters">
+                <input type="date" id="sale-date-from" class="form-control date-input">
+                <input type="date" id="sale-date-to"   class="form-control date-input">
+                <button class="btn btn-ghost btn-sm" id="btn-export-csv">
+                  <i class="fa-solid fa-file-csv"></i> Export
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead><tr><th>ID</th><th>Customer</th><th>Total</th><th>Date</th><th></th></tr></thead>
+                <tbody id="sales-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pagination-wrap" id="sales-pagination"></div>
+          </div>
+        </div>
+
+        <!-- Sale Detail Modal -->
+        <div class="modal-overlay" id="sale-detail-modal">
+          <div class="modal modal-lg">
+            <div class="modal-header">
+              <span><i class="fa-solid fa-receipt"></i> Sale Details</span>
+              <button class="modal-close" onclick="closeModal('sale-detail-modal')" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="modal-body" id="sale-detail-body"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ AI Assistant ══ -->
+      <section class="page" id="page-ai">
+        <div class="ai-layout">
+
+          <!-- Chat -->
+          <div class="card chat-card">
+            <div class="card-header">
+              <i class="fa-solid fa-comments"></i> Smart Reply
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-user"></i> Customer</label>
+              <select id="chat-customer" class="form-control"></select>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+              <div class="chat-placeholder">
+                <i class="fa-solid fa-robot" style="font-size:28px;margin-bottom:10px;display:block"></i>
+                Select a customer and type a message to get an AI-generated reply.
+              </div>
+            </div>
+            <div class="chat-input-wrap">
+              <textarea id="chat-input" class="form-control" rows="2" placeholder="Type customer message… (Enter to send)"></textarea>
+              <button class="btn btn-primary" id="chat-send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Insights + Report -->
+          <div class="ai-right-col">
+            <div class="card">
+              <div class="card-header">
+                <i class="fa-solid fa-chart-bar"></i> Sales Insights
+              </div>
+              <button class="btn btn-secondary" id="btn-insights" style="margin-bottom:12px">
+                <i class="fa-solid fa-rotate"></i> Load Insights
+              </button>
+              <div id="insights-result"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <i class="fa-solid fa-file-lines"></i> Daily Report
+              </div>
+              <button class="btn btn-secondary" id="btn-report" style="margin-bottom:12px">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Report
+              </button>
+              <div id="report-result"></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="js/api.js" defer></script>
+<script src="js/utils.js" defer></script>
+<script src="js/dashboard.js" defer></script>
+<script src="js/customers.js" defer></script>
+<script src="js/products.js" defer></script>
+<script src="js/sales.js" defer></script>
+<script src="js/ai.js" defer></script>
+<script src="js/app.js" defer></script>
+</body>
+</html>

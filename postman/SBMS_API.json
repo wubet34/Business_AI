@@ -1,0 +1,172 @@
+{
+  "info": {
+    "name": "SBMS API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/api" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"John Doe\", \"email\": \"john@example.com\", \"password\": \"secret123\", \"role\": \"admin\" }"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"email\": \"john@example.com\", \"password\": \"secret123\" }"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": { "method": "POST", "url": "{{base_url}}/logout" }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "List Customers",
+          "request": { "method": "GET", "url": "{{base_url}}/customers?limit=10&offset=0&search=john" }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/customers",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Jane Smith\", \"phone\": \"555-1234\", \"email\": \"jane@example.com\", \"notes\": \"VIP customer\" }"
+            }
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/customers/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Jane Updated\", \"phone\": \"555-9999\", \"email\": \"jane@example.com\", \"notes\": \"\" }"
+            }
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": { "method": "DELETE", "url": "{{base_url}}/customers/1" }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List Products",
+          "request": { "method": "GET", "url": "{{base_url}}/products?limit=10&offset=0&search=shirt" }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/products",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Blue T-Shirt\", \"price\": 19.99, \"stock_quantity\": 100 }"
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/products/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Blue T-Shirt XL\", \"price\": 24.99, \"stock_quantity\": 80 }"
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": { "method": "DELETE", "url": "{{base_url}}/products/1" }
+        }
+      ]
+    },
+    {
+      "name": "Sales",
+      "item": [
+        {
+          "name": "List Sales",
+          "request": { "method": "GET", "url": "{{base_url}}/sales?limit=10&offset=0&from=2024-01-01&to=2024-12-31" }
+        },
+        {
+          "name": "Get Sale",
+          "request": { "method": "GET", "url": "{{base_url}}/sales/1" }
+        },
+        {
+          "name": "Create Sale",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/sales",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"customer_id\": 1, \"items\": [ { \"product_id\": 1, \"quantity\": 2 }, { \"product_id\": 2, \"quantity\": 1 } ] }"
+            }
+          }
+        },
+        {
+          "name": "Export Sales CSV",
+          "request": { "method": "GET", "url": "{{base_url}}/sales/export?from=2024-01-01&to=2024-12-31" }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Smart Reply",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/ai/reply",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"customer_id\": 1, \"message\": \"What is the price of your products?\" }"
+            }
+          }
+        },
+        {
+          "name": "Sales Insights",
+          "request": { "method": "GET", "url": "{{base_url}}/ai/insights" }
+        },
+        {
+          "name": "Daily Report",
+          "request": { "method": "GET", "url": "{{base_url}}/ai/report" }
+        }
+      ]
+    }
+  ]
+}
