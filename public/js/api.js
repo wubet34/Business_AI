@@ -1,6 +1,4 @@
 // ── API base URL ───────────────────────────────────────────
-// Auto-detects: Railway (https://yourapp.railway.app/api)
-//               XAMPP   (http://localhost/Business-Ai/api)
 const API_BASE = window.location.hostname === 'localhost'
   ? '/Business-Ai/api'
   : '/api';
