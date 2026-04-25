@@ -24,7 +24,7 @@ class Database {
                     $pass   = getenv('PGPASSWORD') ?: 'root';
                 }
 
-                $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
+                $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};sslmode=require";
                 self::$instance = new PDO($dsn, $user, $pass, [
                     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
