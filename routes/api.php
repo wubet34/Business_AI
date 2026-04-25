@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../utils/helpers.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/CustomerController.php';
@@ -99,9 +100,20 @@ if (matchRoute('GET',  '/ai/report',   $requestMethod, $path)) {
     (new AIController())->report();
 }
 
-// ── Health check (Railway uses this) ─────────────────────────────────────
+// ── Health check ─────────────────────────────────────────────────────────
 if (matchRoute('GET', '/health', $requestMethod, $path)) {
     jsonResponse(200, ['status' => 'ok']);
+}
+
+// ── DB test ───────────────────────────────────────────────────────────────
+if (matchRoute('GET', '/dbtest', $requestMethod, $path)) {
+    try {
+        $db = Database::getInstance();
+        $stmt = $db->query("SELECT version()");
+        jsonResponse(200, ['db' => 'connected', 'version' => $stmt->fetchColumn()]);
+    } catch (Exception $e) {
+        jsonResponse(500, ['db' => 'failed', 'error' => $e->getMessage()]);
+    }
 }
 
 // ── 404 ───────────────────────────────────────────────────────────────────
